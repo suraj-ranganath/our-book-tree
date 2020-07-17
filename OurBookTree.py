@@ -10,40 +10,39 @@ connection = gspread.authorize(credentials)
 
 ################################################################################################################################
 #Email Order Give
-def EmailSend(SName, RName, BookList, Email, Phn, ToEmail, FlagGT):
-    gmail_user = 'bookabookasap@gmail.com'
-    gmail_password = 'ankithsucks'
-
+gmail_user = 'bookabookasap@gmail.com'
+gmail_password = 'ankithsucks'
+server1 = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+server1.ehlo()
+server1.login(gmail_user, gmail_password)
+server2 = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+server2.ehlo()
+server2.login(gmail_user, gmail_password)
+def EmailSend(keyTuple, valueList, FlagGT):
     sent_from = gmail_user
-    to = [ToEmail]
-
+    to = [keyTuple[0]]
+    
+    body = 'Hello %s,\n\nWe have found a match for your books.\n\n'%(keyTuple[1])
     if FlagGT == 'Give':
         subject = 'Give: We have found a match for your books!'
-        body = 'Hello %s,\n\nWe have found a match for your books.\n\n%s has requested for the following books:\n%s\n\nContact Information: \nEmail ID: %s Phone Number: %s \n\nYou can help to end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree '%(SName, RName, BookList, Email, Phn)
+        for i in valueList: 
+            body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
     elif FlagGT == 'Take':
         subject = 'Take: We have found a match for your books!'
-        body = 'Hello %s,\n\nWe have found a match for your books.\n\n%s has offered the following books:\n%s\n\nContact Information: \nEmail ID: %s Phone Number: %s \n\nYou can help to end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree '%(SName, RName, BookList, Email, Phn)
+        for i in valueList:
+            body+="%s has offered the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
     else:
         print("Error")
-    #print(sent_from)
+    body+="You can help to end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree"
     email_text = """\
     From: %s\nTo: %s\nSubject: %s\n%s
 
     """ % (sent_from, ", ".join(to), subject, body)
 
     if FlagGT == 'Give':
-        server1 = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server1.ehlo()
-        server1.login(gmail_user, gmail_password)
         server1.sendmail(sent_from, to, email_text)
-        server1.close()
     elif FlagGT == 'Take':
-        server2 = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server2.ehlo()
-        server2.login(gmail_user, gmail_password)
         server2.sendmail(sent_from, to, email_text)
-        server2.close()
-    #print("SUCCESS! ankith sucks1!")
 
 #################################################################################################################################
 #ALL Books Table
@@ -228,14 +227,32 @@ def allbooksupdate():
             if i != j and i[:3] == j[:3] and i[4:] == j[4:]:
                 i[3] += j[3]
                 BookL.remove(j)
-    #print(BookL)
+    
     for i in BookL:
         for j in range(len(i[3])):
             i[3][j] = str(j+1) + '. ' + i[3][j]
-    for q in BookL:
-        BookStr = '\n\n'.join(q[3])
-        #EmailSend(q[5], q[1], BookStr, q[0], q[2], q[4], 'Give')
-        #EmailSend(q[1], q[5], BookStr, q[4], q[6], q[0], 'Take')
+
+    DGive = {}
+    DTake = {}
+    
+    for i in BookL:
+        if tuple(i[4:]) in DGive:
+            DGive[tuple(i[4:])] += [[i[3]] + i[:3]]
+        else:
+            DGive[tuple(i[4:])] = [[i[3]] + i[:3]]
+
+    for i in BookL:
+        if tuple(i[:3]) in DTake:
+            DTake[tuple(i[:3])] += [[i[3]] + i[4:]]
+        else:
+            DTake[tuple(i[:3])] = [[i[3]] + i[4:]]
+
+    for i in DGive:
+        EmailSend(i, DGive[i], 'Give')
+
+    for i in DTake:
+        EmailSend(i, DTake[i], 'Take')
+
     Lm = []
     for m in range(len(values3)):
         if values3[m][13] == 0:
@@ -248,6 +265,8 @@ def allbooksupdate():
 if __name__ == '__main__':
     allbooksupdate()
 
+server1.close()
+server2.close()
 #########################################################
 
 
