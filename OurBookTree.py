@@ -16,7 +16,7 @@ def EmailSend(SName, RName, BookList, Email, Phn, ToEmail, FlagGT):
 
     sent_from = gmail_user
     to = [ToEmail]
-    
+
     if FlagGT == 'Give':
         subject = 'Give: We have found a match for your books!'
         body = 'Hello %s,\n\nWe have found a match for your books.\n\n%s has requested for the following books:\n%s\n\nContact Information: \nEmail ID: %s Phone Number: %s \n\nYou can help to end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree '%(SName, RName, BookList, Email, Phn)
@@ -42,7 +42,7 @@ def EmailSend(SName, RName, BookList, Email, Phn, ToEmail, FlagGT):
         server2.ehlo()
         server2.login(gmail_user, gmail_password)
         server2.sendmail(sent_from, to, email_text)
-        server2.close()        
+        server2.close()
     #print("SUCCESS! ankith sucks1!")
 
 #################################################################################################################################
@@ -56,10 +56,8 @@ def main3sub():
     global values3
     worksheet3 = connection.open("BooksToGive").worksheet('AllEntries')
     values3 = worksheet3.get('A2:P')
-    for i in values3:
-        i[13] = int(i[13])
-
-
+    for i in range(len(values3)):
+        values3[i][13] = int(values3[i][13])
 
 if __name__ == '__main__':
     main3sub()
@@ -119,6 +117,8 @@ def main2():
     worksheet2 = connection.open("BooksToGive").worksheet('BookQuan')
     global values2
     values2 = worksheet2.get('A3:B')
+    for i in range(len(values2)):
+        values2[i][0] = values2[i][0].strip()
 
 
 
@@ -181,6 +181,8 @@ def main4():
     worksheet4 = connection.open("BooksToGive").worksheet('Categorized')
     global values4
     values4 = worksheet4.get('A2:H')
+    for i in range(len(values4)):
+        values4[i][1] = values4[i][1].strip()
 
 
 if __name__ == '__main__':
@@ -191,9 +193,9 @@ if __name__ == '__main__':
 #ALLBOOKSUPDATE
 
 
-#LProduct = (Give)BookQuan
+#LProduct = deepcopy of values2
 #values1 = FormResponses
-#values2 = deepcopy of LProduct
+#values2 = (Give)BookQuan
 #values3 = (Give)AllEntries
 #values4 = (Give)Categorised
 
@@ -211,7 +213,7 @@ def allbooksupdate():
                         worksheet3.update('A2:P', values3)
 
 
-    
+
     for i in LGiven:
         s = ''.join(i[7:13])
         i += [s]
@@ -232,8 +234,8 @@ def allbooksupdate():
             i[3][j] = str(j+1) + '. ' + i[3][j]
     for q in BookL:
         BookStr = '\n\n'.join(q[3])
-        EmailSend(q[5], q[1], BookStr, q[0], q[2], q[4], 'Give')
-        EmailSend(q[1], q[5], BookStr, q[4], q[6], q[0], 'Take')
+        #EmailSend(q[5], q[1], BookStr, q[0], q[2], q[4], 'Give')
+        #EmailSend(q[1], q[5], BookStr, q[4], q[6], q[0], 'Take')
     Lm = []
     for m in range(len(values3)):
         if values3[m][13] == 0:
