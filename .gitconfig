@@ -14,3 +14,6 @@
         hist = log --graph --oneline --decorate
         st = status
 
+[user]
+	email = suraj.ranganath@gmail.com
+	name = suraj-ranganath
