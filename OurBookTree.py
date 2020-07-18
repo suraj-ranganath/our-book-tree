@@ -21,11 +21,11 @@ server2.login(gmail_user, gmail_password)
 def EmailSend(keyTuple, valueList, FlagGT):
     sent_from = gmail_user
     to = [keyTuple[0]]
-    
+
     body = 'Hello %s,\n\nWe have found a match for your books.\n\n'%(keyTuple[1])
     if FlagGT == 'Give':
         subject = 'Give: We have found a match for your books!'
-        for i in valueList: 
+        for i in valueList:
             body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
     elif FlagGT == 'Take':
         subject = 'Take: We have found a match for your books!'
@@ -227,14 +227,14 @@ def allbooksupdate():
             if i != j and i[:3] == j[:3] and i[4:] == j[4:]:
                 i[3] += j[3]
                 BookL.remove(j)
-    
+
     for i in BookL:
         for j in range(len(i[3])):
             i[3][j] = str(j+1) + '. ' + i[3][j]
 
     DGive = {}
     DTake = {}
-    
+
     for i in BookL:
         if tuple(i[4:]) in DGive:
             DGive[tuple(i[4:])] += [[i[3]] + i[:3]]
