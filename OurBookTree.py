@@ -7,11 +7,42 @@ import smtplib
 SCOPES = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name("our-book-tree-5e94c77c0c5f.json", SCOPES)
 connection = gspread.authorize(credentials)
+gmail_user = 'bookabookasap@gmail.com'
+gmail_password = 'ankithsucks'
+
+################################################################################################################################
+#Reg
+
+def reg():
+    global worksheetReg
+    worksheetReg = connection.open('Registration').worksheet('Reg')
+    global valuesReg
+    valuesReg = worksheetReg.get('A2:E')
+    global RegEmailList
+    RegEmailList = [i[1] for i in valuesReg]
+
+
+if __name__ == '__main__':
+    reg()
+
+def regDeniedEmail(ToEmail):
+    server3 = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server3.ehlo()
+    server3.login(gmail_user, gmail_password)
+    sent_from = gmail_user
+    to = [ToEmail]
+    subject = "Our Book Tree: Access Denied."
+    body = "Hello,\n\nUnfortunately your entry was not recorded as you have not registered with our website.\nRegister here: https://forms.gle/DDRK6nwn7diDkUzD6 and submit your response again.\n\n\nThank You,\nOur Book Tree"
+    email_text = """\
+    From: %s\nTo: %s\nSubject: %s\n%s
+    
+    """ % (sent_from, ", ".join(to), subject, body)
+    server3.sendmail(sent_from, to, email_text)
+    server3.close()
+
 
 ################################################################################################################################
 #Email Order Give
-gmail_user = 'bookabookasap@gmail.com'
-gmail_password = 'ankithsucks'
 server1 = smtplib.SMTP_SSL('smtp.gmail.com', 465)
 server1.ehlo()
 server1.login(gmail_user, gmail_password)
@@ -43,6 +74,9 @@ def EmailSend(keyTuple, valueList, FlagGT):
         server1.sendmail(sent_from, to, email_text)
     elif FlagGT == 'Take':
         server2.sendmail(sent_from, to, email_text)
+### Deleting rows
+def main3(y, ws):
+    ws.delete_rows(y)
 
 #################################################################################################################################
 #ALL Books Table
@@ -57,12 +91,28 @@ def main3sub():
     values3 = worksheet3.get('A2:P')
     for i in range(len(values3)):
         values3[i][13] = int(values3[i][13])
+    Lindex = []
+    
+    for m in range(len(values3)):
+        if values3[m][2] not in RegEmailList:
+            Lindex+=[m+1]
+
+
+    LRegEmail3=[]
+    for i in Lindex:
+        i = i - Lindex.index(i)
+        main3(i+1, worksheet3)
+        if values3[i-1][2] not in LRegEmail3:
+            LRegEmail3 += [values3[i-1][2]]
+        values3.remove(values3[i-1])
+        
+    for i in LRegEmail3:
+        regDeniedEmail(i)
 
 if __name__ == '__main__':
     main3sub()
 
-def main3(y):
-    worksheet3.delete_rows(y)
+
 
 
 #################################################################################################################################
@@ -73,6 +123,25 @@ def main1():
     worksheet1 = connection.open("BooksToTake").worksheet('FormResponses')
     global values1
     values1 = worksheet1.get('A2:O')
+
+    Lindex = []
+    
+    for m in range(len(values1)):
+        if values1[m][12] not in RegEmailList:
+            Lindex+=[m+1]
+
+
+    LRegEmail1=[]
+    for i in Lindex:
+        i = i - Lindex.index(i)
+        main3(i+1, worksheet1)
+        if values1[i-1][12] not in LRegEmail1:
+            LRegEmail1+= [values1[i-1][12]]
+        values1.remove(values1[i-1])
+        
+    for i in LRegEmail1:
+        regDeniedEmail(i)
+        
     for i in range(len(values1)):
         if len(values1[i]) == 13:
             s = ''.join(values1[i][4:10])
@@ -139,7 +208,9 @@ def main2():
                         if LProduct[k][1] > 0:
                             LProduct[k][1] -= 1
                             j[1] = 1
-                            BookL+=[[i[3],i[4],i[5],[j[0]]]]
+                            for m in valuesReg:
+                                if i[3] == m[1]:
+                                    BookL+=[[i[3],m[2],m[3],[j[0]]]]
 
     global LTaken
     LTaken = copy.deepcopy(LOrder)
@@ -220,8 +291,10 @@ def allbooksupdate():
     for i in BookL:
         for j in LGiven:
             if [j[-1]] ==  i[3]:
-                i+= [j[2],j[1],j[3]]
-                i[3][0] += '\n    Edition: ' + j[-3] + '\tYear of Publishing: ' + j[-2]
+                for m in valuesReg:
+                    if m[1] == j[2]:
+                        i+= [j[2],m[2],m[3]]
+                        i[3][0] += '\n    Condition of Book: ' + j[-3] + '\tYear of Publishing: ' + j[-2]
     for i in BookL:
         for j in BookL:
             if i != j and i[:3] == j[:3] and i[4:] == j[4:]:
@@ -259,8 +332,7 @@ def allbooksupdate():
             Lm+=[m+1]
     for i in Lm:
         i = i - Lm.index(i)
-        main3(i+1)
-
+        main3(i+1, worksheet3)
 
 if __name__ == '__main__':
     allbooksupdate()
