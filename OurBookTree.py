@@ -3,6 +3,8 @@ import copy
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import smtplib
+from geopy.geocoders import Nominatim
+from geopy.distance import great_circle
 
 SCOPES = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name("our-book-tree-5e94c77c0c5f.json", SCOPES)
@@ -17,7 +19,10 @@ def reg():
     global worksheetReg
     worksheetReg = connection.open('Registration').worksheet('Reg')
     global valuesReg
-    valuesReg = worksheetReg.get('A2:E')
+    valuesReg = worksheetReg.get('A2:F')
+    for i in valuesReg:
+        if 'Bangalore' not in i[-2] and 'Bengaluru' not in i[-2]:
+            i[-2] += ' Bangalore'
     global RegEmailList
     RegEmailList = [i[1] for i in valuesReg]
 
@@ -39,7 +44,32 @@ def regDeniedEmail(ToEmail):
     """ % (sent_from, ", ".join(to), subject, body)
     server3.sendmail(sent_from, to, email_text)
     server3.close()
-
+################################################################################################################################
+#Distance
+def mdistance(TakeLoc, GiveLoc):   
+    geolocator = Nominatim(user_agent="our-book-tree")
+    try:
+        location2 = geolocator.geocode(TakeLoc[0]) 
+        (x1,y1) = (location2.latitude, location2.longitude)
+    except:
+        location2 = geolocator.geocode(str(TakeLoc[1])) 
+        (x1,y1) = (location2.latitude, location2.longitude)
+    distList = []
+    for i in GiveLoc:
+        try:
+            location1 = geolocator.geocode(i[4]) 
+            (x2,y2) = (location1.latitude, location1.longitude)
+        except:
+            location1 = geolocator.geocode(str(i[5])) 
+            (x2,y2) = (location1.latitude, location1.longitude)
+        distList += [i + [great_circle((x1, y1), (x2, y2)).kilometers]]
+    mindist = distList[0][-1]
+    minL = distList[0]
+    for i in distList:
+        if i[-1] <= mindist:
+            mindist = i[-1]
+            minL = i
+    return minL
 
 ################################################################################################################################
 #Email Order Give
@@ -56,15 +86,20 @@ def EmailSend(keyTuple, valueList, FlagGT):
     body = 'Hello %s,\n\nWe have found a match for your books.\n\n'%(keyTuple[1])
     if FlagGT == 'Give':
         subject = 'Give: We have found a match for your books!'
+<<<<<<< HEAD
         for i in valueList:
             body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+=======
+        for i in valueList: 
+            body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\nWe have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+>>>>>>> ed2bd413eeac08ff0e2ff77cc7579187be58e54a
     elif FlagGT == 'Take':
         subject = 'Take: We have found a match for your books!'
         for i in valueList:
-            body+="%s has offered the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+            body+="%s has offered the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\nWe have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
     else:
         print("Error")
-    body+="You can help to end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree"
+    body+="You can help end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree"
     email_text = """\
     From: %s\nTo: %s\nSubject: %s\n%s
 
@@ -200,6 +235,7 @@ def main2():
         LProduct = copy.deepcopy(values2)
     global BookL
     BookL = []
+
     for i in LOrder:
         if int(i[2]) != len(i[1]):
             for j in i[1]:
@@ -210,7 +246,8 @@ def main2():
                             j[1] = 1
                             for m in valuesReg:
                                 if i[3] == m[1]:
-                                    BookL+=[[i[3],m[2],m[3],[j[0]]]]
+                                    
+                                    BookL+=[[i[3],m[2],m[3],m[4],m[5],[j[0]]]]
 
     global LTaken
     LTaken = copy.deepcopy(LOrder)
@@ -276,11 +313,21 @@ def allbooksupdate():
     for i in LProduct:
         for j in values2:
             if i[1] != j[1] and i[0]==j[0]:
+                locGive = []
                 for m in range(len(values3)):
                     if values4[m][1] == i[0]:
-                        values3[m][13] = int(values3[m][13]) - 1
-                        LGiven += [values3[m]]
-                        worksheet3.update('A2:P', values3)
+                        for y in valuesReg:
+                            if y[1] == values3[m][2]:
+                                locGive +=[y + [values3[m][0]]]
+                for z in BookL:
+                    locTake = z[3:5]
+                    Lopt = mdistance(locTake,locGive)
+                    z += [Lopt[1], Lopt[2], Lopt[3]]
+                    for v in values3:
+                        if v[2] == Lopt[1] and ''.join(v[7:13]) == ''.join(z[5]):
+                            v[13] = int(v[13]) - 1
+                            LGiven += [v]
+                            worksheet3.update('A2:P', values3)
 
 
 
@@ -288,37 +335,37 @@ def allbooksupdate():
         s = ''.join(i[7:13])
         i += [s]
 
+    print(LGiven)
     for i in BookL:
         for j in LGiven:
-            if [j[-1]] ==  i[3]:
+            if [j[-1]] ==  i[5]:
                 for m in valuesReg:
                     if m[1] == j[2]:
-                        i+= [j[2],m[2],m[3]]
-                        i[3][0] += '\n    Condition of Book: ' + j[-3] + '\tYear of Publishing: ' + j[-2]
+                        i[5][0] += '\n    Condition of Book: ' + j[-3] + '\tYear of Publishing: ' + j[-2]
     for i in BookL:
         for j in BookL:
-            if i != j and i[:3] == j[:3] and i[4:] == j[4:]:
-                i[3] += j[3]
+            if i != j and i[:5] == j[:5] and i[6:] == j[6:]:
+                i[5] += j[5]
                 BookL.remove(j)
 
     for i in BookL:
-        for j in range(len(i[3])):
-            i[3][j] = str(j+1) + '. ' + i[3][j]
+        for j in range(len(i[5])):
+            i[5][j] = str(j+1) + '. ' + i[5][j]
 
     DGive = {}
     DTake = {}
 
     for i in BookL:
-        if tuple(i[4:]) in DGive:
-            DGive[tuple(i[4:])] += [[i[3]] + i[:3]]
+        if tuple(i[6:]) in DGive:
+            DGive[tuple(i[6:])] += [[i[5]] + i[:5]]
         else:
-            DGive[tuple(i[4:])] = [[i[3]] + i[:3]]
+            DGive[tuple(i[6:])] = [[i[5]] + i[:5]]
 
     for i in BookL:
-        if tuple(i[:3]) in DTake:
-            DTake[tuple(i[:3])] += [[i[3]] + i[4:]]
+        if tuple(i[:5]) in DTake:
+            DTake[tuple(i[:5])] += [[i[5]] + i[6:]]
         else:
-            DTake[tuple(i[:3])] = [[i[3]] + i[4:]]
+            DTake[tuple(i[:5])] = [[i[5]] + i[6:]]
 
     for i in DGive:
         EmailSend(i, DGive[i], 'Give')
