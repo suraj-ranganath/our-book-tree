@@ -20,9 +20,9 @@ def reg():
     worksheetReg = connection.open('Registration').worksheet('Reg')
     global valuesReg
     valuesReg = worksheetReg.get('A2:F')
-    for i in valuesReg:
-        if 'Bangalore' not in i[-2] and 'Bengaluru' not in i[-2]:
-            i[-2] += ' Bangalore'
+    for i in range(len(valuesReg)):
+        if 'Bangalore' not in valuesReg[i[-2]] and 'Bengaluru' not in valuesReg[i[-2]]:
+            valuesReg[i[-2]] += ' Bangalore'
     global RegEmailList
     RegEmailList = [i[1] for i in valuesReg]
 
