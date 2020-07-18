@@ -1,0 +1,32 @@
+go to the folder you want to store your files in:
+
+i have already done this:
+git init
+
+git remote add origin master <url>
+git remote -v //verify remote url
+
+Do this:
+
+VERY IMPORTANT
+
+//always 
+git pull origin master 
+//before starting a new session.
+if two people are working at once, coordinate beforehand. work only on different files.
+
+Open your favourite code editor (not notepad please) and make changes.
+
+git add <files you changed>
+git commit -m "commit message"
+
+git status //find out which files you've changed, what git has taken note of, etc
+
+If you have 3 small changes to make, make 3 seperate commits.
+Once you make them and are going offline:
+
+git push origin master
+
+everytime you create a new repo associated with the Relief Reunite project:
+git config user.email "suraj@reliefreunite.com"
+git config user.name "surajranganath"
