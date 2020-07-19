@@ -92,15 +92,19 @@ def EmailSend(keyTuple, valueList, FlagGT):
             body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
 =======
         for i in valueList: 
+<<<<<<< HEAD
             body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\nWe have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
 >>>>>>> ed2bd413eeac08ff0e2ff77cc7579187be58e54a
+=======
+            body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+>>>>>>> 7104059f81c8685b15300b10f0c36edc5b9f2c60
     elif FlagGT == 'Take':
         subject = 'Take: We have found a match for your books!'
         for i in valueList:
-            body+="%s has offered the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\nWe have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+            body+="%s has offered the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
     else:
         print("Error")
-    body+="You can help end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree"
+    body+="We have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\nYou can help end hunger in classrooms. Visit: https://www.ourbooktree.org/donate-now\n\n\nThank You,\nOur Book Tree"
     email_text = """\
     From: %s\nTo: %s\nSubject: %s\n%s
 
