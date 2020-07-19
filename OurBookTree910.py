@@ -83,17 +83,12 @@ server2.login(gmail_user, gmail_password)
 def EmailSend(keyTuple, valueList, FlagGT):
     sent_from = gmail_user
     to = [keyTuple[0]]
-
+    
     body = 'Hello %s,\n\nWe have found a match for your books.\n\n'%(keyTuple[1])
     if FlagGT == 'Give':
         subject = 'Give: We have found a match for your books!'
-<<<<<<< HEAD
-        for i in valueList:
-            body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
-=======
         for i in valueList: 
             body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\nWe have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
->>>>>>> ed2bd413eeac08ff0e2ff77cc7579187be58e54a
     elif FlagGT == 'Take':
         subject = 'Take: We have found a match for your books!'
         for i in valueList:
@@ -123,7 +118,7 @@ def main3sub():
     """
     global worksheet3
     global values3
-    worksheet3 = connection.open("BooksToGive").worksheet('AllEntries')
+    worksheet3 = connection.open("Books to Give for classes 9 and 10").worksheet('AllEntries')
     values3 = worksheet3.get('A2:P')
     for i in range(len(values3)):
         values3[i][13] = int(values3[i][13])
@@ -156,7 +151,7 @@ if __name__ == '__main__':
 
 def main1():
     global worksheet1
-    worksheet1 = connection.open("BooksToTake").worksheet('FormResponses')
+    worksheet1 = connection.open("Books to Take for classes 9 and 10").worksheet('FormResponses')
     global values1
     values1 = worksheet1.get('A2:O')
 
@@ -218,7 +213,7 @@ if __name__ == '__main__':
 
 
 def main2():
-    worksheet2 = connection.open("BooksToGive").worksheet('BookQuan')
+    worksheet2 = connection.open("Books to Give for classes 9 and 10").worksheet('BookQuan')
     global values2
     values2 = worksheet2.get('A3:C')
     for i in range(len(values2)):
@@ -245,7 +240,8 @@ def main2():
                             LProduct[k][1] -= 1
                             j[1] = 1
                             for m in valuesReg:
-                                if i[3] == m[1] and i[-1] == LProduct[k][-1]:  
+                                if i[3] == m[1] and i[-1] == LProduct[k][-1]:
+                                    
                                     BookL+=[[i[3],m[2],m[3],m[4],m[5],i[-1],[j[0]]]]
 
     for i in LOrder:
@@ -282,7 +278,7 @@ if __name__ == '__main__':
 
 
 def main4():
-    worksheet4 = connection.open("BooksToGive").worksheet('Categorized')
+    worksheet4 = connection.open("Books to Give for classes 9 and 10").worksheet('Categorized')
     global values4
     values4 = worksheet4.get('A2:H')
     for i in range(len(values4)):
@@ -332,14 +328,14 @@ def allbooksupdate():
             if i != j and i[:6] == j[:6] and i[7:] == j[7:]:
                 i[6] += j[6]
                 BookL.remove(j)
-
+    
     for i in BookL:
         for j in range(len(i[6])):
             i[6][j] = str(j+1) + '. ' + i[6][j]
 
     DGive = {}
     DTake = {}
-
+    
     for i in BookL:
         if tuple(i[7:]) in DGive:
             DGive[tuple(i[7:])] += [[i[6]] + i[:6]]
@@ -351,6 +347,7 @@ def allbooksupdate():
             DTake[tuple(i[:6])] += [[i[6]] + i[7:]]
         else:
             DTake[tuple(i[:6])] = [[i[6]] + i[7:]]
+
     
     for i in DGive:
         EmailSend(i, DGive[i], 'Give')
