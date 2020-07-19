@@ -30,3 +30,21 @@ git push origin master
 everytime you create a new repo associated with the Relief Reunite project:
 git config user.email "suraj@reliefreunite.com"
 git config user.name "surajranganath"
+
+
+
+It's not a Git error message, it's the editor as git uses your default editor.
+
+To solve this:
+
+press "i" (i for insert)
+write your merge message
+press "esc" (escape)
+write ":wq" (write & quit)
+then press enter
+
+MERGE CONFLICTS
+if you want to go back to the version before the conflict then 
+1)git log --pretty=oneline
+2)git reset --hard <commit_before_merge>
+	<commit_before_merge> = first 5 digits in appropriate ID on doing git log
