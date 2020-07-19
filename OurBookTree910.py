@@ -118,7 +118,7 @@ def main3sub():
     """
     global worksheet3
     global values3
-    worksheet3 = connection.open("BooksToGive").worksheet('AllEntries')
+    worksheet3 = connection.open("Books to Give for classes 9 and 10").worksheet('AllEntries')
     values3 = worksheet3.get('A2:P')
     for i in range(len(values3)):
         values3[i][13] = int(values3[i][13])
@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
 def main1():
     global worksheet1
-    worksheet1 = connection.open("BooksToTake").worksheet('FormResponses')
+    worksheet1 = connection.open("Books to Take for classes 9 and 10").worksheet('FormResponses')
     global values1
     values1 = worksheet1.get('A2:O')
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
 
 
 def main2():
-    worksheet2 = connection.open("BooksToGive").worksheet('BookQuan')
+    worksheet2 = connection.open("Books to Give for classes 9 and 10").worksheet('BookQuan')
     global values2
     values2 = worksheet2.get('A3:C')
     for i in range(len(values2)):
@@ -240,7 +240,8 @@ def main2():
                             LProduct[k][1] -= 1
                             j[1] = 1
                             for m in valuesReg:
-                                if i[3] == m[1] and i[-1] == LProduct[k][-1]:  
+                                if i[3] == m[1] and i[-1] == LProduct[k][-1]:
+                                    
                                     BookL+=[[i[3],m[2],m[3],m[4],m[5],i[-1],[j[0]]]]
 
     for i in LOrder:
@@ -277,7 +278,7 @@ if __name__ == '__main__':
 
 
 def main4():
-    worksheet4 = connection.open("BooksToGive").worksheet('Categorized')
+    worksheet4 = connection.open("Books to Give for classes 9 and 10").worksheet('Categorized')
     global values4
     values4 = worksheet4.get('A2:H')
     for i in range(len(values4)):
@@ -346,6 +347,7 @@ def allbooksupdate():
             DTake[tuple(i[:6])] += [[i[6]] + i[7:]]
         else:
             DTake[tuple(i[:6])] = [[i[6]] + i[7:]]
+
     
     for i in DGive:
         EmailSend(i, DGive[i], 'Give')
