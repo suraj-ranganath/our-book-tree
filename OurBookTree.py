@@ -83,12 +83,21 @@ server2.login(gmail_user, gmail_password)
 def EmailSend(keyTuple, valueList, FlagGT):
     sent_from = gmail_user
     to = [keyTuple[0]]
-    
+
     body = 'Hello %s,\n\nWe have found a match for your books.\n\n'%(keyTuple[1])
     if FlagGT == 'Give':
         subject = 'Give: We have found a match for your books!'
-        for i in valueList: 
+<<<<<<< HEAD
+        for i in valueList:
             body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+=======
+        for i in valueList: 
+<<<<<<< HEAD
+            body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\nWe have found the best possible match for you using our optimization algorithms.\nIf you need to deliver your books, you can use: https://www.dunzo.com/bangalore/send-packages \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+>>>>>>> ed2bd413eeac08ff0e2ff77cc7579187be58e54a
+=======
+            body+= "%s has requested for the following books:\n%s\n\n    Contact Information: \n    Email ID: %s Phone Number: %s \n\n"%(i[2], "\n\n".join(i[0]), i[1], i[3])
+>>>>>>> 7104059f81c8685b15300b10f0c36edc5b9f2c60
     elif FlagGT == 'Take':
         subject = 'Take: We have found a match for your books!'
         for i in valueList:
@@ -327,14 +336,14 @@ def allbooksupdate():
             if i != j and i[:6] == j[:6] and i[7:] == j[7:]:
                 i[6] += j[6]
                 BookL.remove(j)
-    
+
     for i in BookL:
         for j in range(len(i[6])):
             i[6][j] = str(j+1) + '. ' + i[6][j]
 
     DGive = {}
     DTake = {}
-    
+
     for i in BookL:
         if tuple(i[7:]) in DGive:
             DGive[tuple(i[7:])] += [[i[6]] + i[:6]]
